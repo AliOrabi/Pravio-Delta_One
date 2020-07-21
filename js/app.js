@@ -1,124 +1,232 @@
 (function(global) {
-  const pageSections = Array.from(
-    document.querySelectorAll("section[data-nav]")
-  );
-  const navItemsContainer = document.querySelector("#navbar__list");
-  /* 
-    navAnchors returns a live node collection and will get updated
-    with new anchor elements as they are added to the DOM
-  */
-  const navAnchors = navItemsContainer.getElementsByTagName("a");
-  let clickActive = false;
-
-  /* 
-    Utility functions
-    =======================================
-  */
-
-  const removeClass = (clas, elems) => {
-    Array.from(elems).forEach(elem => elem.classList.remove(clas));
-  };
-
-  /* 
-    Event handlers
-   =======================================
-  */
-
-  const handleScroll = () => {
+    const pageSections = Array.from(
+        document.querySelectorAll("section[data-nav]")
+    );
+    const navItemsContainer = document.querySelector("#navbar__list");
     /* 
-      Do not run scroll handler when user is navigating by clicking
-      through nav sections. This is to prevent janky transitions
-      on the nav anchors
+      navAnchors returns a live node collection and will get updated
+      with new anchor elements as they are added to the DOM
     */
-    if (clickActive) return;
+    const navAnchors = navItemsContainer.getElementsByTagName("a");
+    let clickActive = false;
 
-    const activePageSection = pageSections.find(section => {
-      const lowerRange = section.offsetTop;
-      const upperRange = section.offsetTop + section.offsetHeight;
-      const scrollPos = global.pageYOffset + 250;
+    /* 
+      Utility functions
+      =======================================
+    */
 
-      return scrollPos >= lowerRange && scrollPos <= upperRange;
-    });
-    let activeNavAnchor;
+    const removeClass = (clas, elems) => {
+        Array.from(elems).forEach(elem => elem.classList.remove(clas));
+    };
 
-    removeClass("active-section", pageSections);
-    removeClass("active", navAnchors);
+    /* 
+      Event handlers
+     =======================================
+    */
 
-    if (activePageSection) {
-      activeNavAnchor = Array.from(navAnchors).find(
-        anchor => anchor.getAttribute("href").slice(1) === activePageSection.id
-      );
+    const handleScroll = () => {
+        /* 
+          Do not run scroll handler when user is navigating by clicking
+          through nav sections. This is to prevent janky transitions
+          on the nav anchors
+        */
+        if (clickActive) return;
 
-      activePageSection.classList.add("active-section");
-      activeNavAnchor.classList.add("active");
-    }
-  };
+        const activePageSection = pageSections.find(section => {
+            const lowerRange = section.offsetTop;
+            const upperRange = section.offsetTop + section.offsetHeight;
+            const scrollPos = global.pageYOffset + 250;
 
-  const handleClick = e => {
-    e.preventDefault();
-    clickActive = true;
-    const targetElem = e.target;
+            return scrollPos >= lowerRange && scrollPos <= upperRange;
+        });
+        let activeNavAnchor;
 
-    if (targetElem.nodeName === "A") {
-      const target = targetElem.getAttribute("href").slice(1);
-      const requestedPageSection = pageSections.find(
-        section => section.id === target
-      );
+        removeClass("active-section", pageSections);
+        removeClass("active", navAnchors);
 
-      removeClass("active-section", pageSections);
-      removeClass("active", navAnchors);
+        if (activePageSection) {
+            activeNavAnchor = Array.from(navAnchors).find(
+                anchor => anchor.getAttribute("href").slice(1) === activePageSection.id
+            );
 
-      targetElem.classList.add("active");
-      requestedPageSection.scrollIntoView({ behavior: "smooth" });
-      requestedPageSection.classList.add("active-section");
+            activePageSection.classList.add("active-section");
+            activeNavAnchor.classList.add("active");
+        }
+    };
 
-      setTimeout(() => (clickActive = !clickActive), 2000);
-    }
-  };
+    const handleClick = e => {
+        e.preventDefault();
+        clickActive = true;
+        const targetElem = e.target;
 
-  /* 
-    Define main functions
-    =======================================
-  */
+        if (targetElem.nodeName === "A") {
+            const target = targetElem.getAttribute("href").slice(1);
+            const requestedPageSection = pageSections.find(
+                section => section.id === target
+            );
 
-  const buildNavigationMenu = () => {
-    const navItemsFragment = document.createDocumentFragment();
+            removeClass("active-section", pageSections);
+            removeClass("active", navAnchors);
 
-    pageSections.forEach(section => {
-      const navItem = document.createElement("li");
-      const linkItem = document.createElement("a");
-      const sectionId = section.id;
+            targetElem.classList.add("active");
+            requestedPageSection.scrollIntoView({ behavior: "smooth" });
+            requestedPageSection.classList.add("active-section");
 
-      linkItem.textContent = section.dataset.nav;
-      linkItem.classList.add("menu__link");
-      linkItem.setAttribute("href", `#${sectionId}`);
+            setTimeout(() => (clickActive = !clickActive), 2000);
+        }
+    };
 
-      navItem.append(linkItem);
-      navItemsFragment.append(navItem);
-    });
+    /* 
+      Define main functions
+      =======================================
+    */
 
-    navItemsContainer.append(navItemsFragment);
-  };
+    const buildNavigationMenu = () => {
+        const navItemsFragment = document.createDocumentFragment();
 
-  const attachEventListeners = () => {
-    navItemsContainer.addEventListener("click", handleClick);
-    global.addEventListener("scroll", handleScroll);
-  };
+        pageSections.forEach(section => {
+            const navItem = document.createElement("li");
+            const linkItem = document.createElement("a");
+            const sectionId = section.id;
 
-  /* 
-    Initialize main functions
-    =======================================
-  */
+            linkItem.textContent = section.dataset.nav;
+            linkItem.classList.add("menu__link");
+            linkItem.setAttribute("href", `#${sectionId}`);
 
-  buildNavigationMenu();
-  attachEventListeners();
+            navItem.append(linkItem);
+            navItemsFragment.append(navItem);
+        });
+
+        navItemsContainer.append(navItemsFragment);
+    };
+
+    const attachEventListeners = () => {
+        navItemsContainer.addEventListener("click", handleClick);
+        global.addEventListener("scroll", handleScroll);
+    };
+
+    /* 
+      Initialize main functions
+      =======================================
+    */
+
+    buildNavigationMenu();
+    attachEventListeners();
 })(window);
 
-function myFunction() {
-  var x = document.getElementById("topnav");
-  if (x.className === "navbar__menu") {
-    x.className += " responsive";
-  } else {
-    x.className = "navbar__menu";
-  }
-};
+// Global2
+(function(Global2) {
+    const pageSections = Array.from(
+        document.querySelectorAll("section[data-nav]")
+    );
+    const navItemsContainer = document.querySelector("nav-mobile");
+    /* 
+      navAnchors returns a live node collection and will get updated
+      with new anchor elements as they are added to the DOM
+    */
+    const navAnchors = navItemsContainer.getElementById("nav-toggle");
+    let clickActive = false;
+
+    /* 
+      Utility functions
+      =======================================
+    */
+
+    const removeClass = (clas, elems) => {
+        Array.from(elems).forEach(elem => elem.classList.remove(clas));
+    };
+
+    /* 
+      Event handlers
+     =======================================
+    */
+
+    const handleScroll = () => {
+        /* 
+          Do not run scroll handler when user is navigating by clicking
+          through nav sections. This is to prevent janky transitions
+          on the nav anchors
+        */
+        if (clickActive) return;
+
+        const activePageSection = pageSections.find(section => {
+            const lowerRange = section.offsetTop;
+            const upperRange = section.offsetTop + section.offsetHeight;
+            const scrollPos = global.pageYOffset + 250;
+
+            return scrollPos >= lowerRange && scrollPos <= upperRange;
+        });
+        let activeNavAnchor;
+
+        removeClass("active-section", pageSections);
+        removeClass("active", navAnchors);
+
+        if (activePageSection) {
+            activeNavAnchor = Array.from(navAnchors).find(
+                anchor => anchor.getAttribute("href").slice(1) === activePageSection.id
+            );
+
+            activePageSection.classList.add("active-section");
+            activeNavAnchor.classList.add("active");
+        }
+    };
+
+    const handleClick = e => {
+        e.preventDefault();
+        clickActive = true;
+        const targetElem = e.target;
+
+        if (targetElem.nodeName === "A") {
+            const target = targetElem.getAttribute("href").slice(1);
+            const requestedPageSection = pageSections.find(
+                section => section.id === target
+            );
+
+            removeClass("active-section", pageSections);
+            removeClass("active", navAnchors);
+
+            targetElem.classList.add("active");
+            requestedPageSection.scrollIntoView({ behavior: "smooth" });
+            requestedPageSection.classList.add("active-section");
+
+            setTimeout(() => (clickActive = !clickActive), 2000);
+        }
+    };
+
+    /* 
+      Define main functions
+      =======================================
+    */
+
+    const buildNavigationMenu = () => {
+        const navItemsFragment = document.createDocumentFragment();
+
+        pageSections.forEach(section => {
+            const navItem = document.createElement("li");
+            const linkItem = document.createElement("a");
+            const sectionId = section.id;
+
+            linkItem.textContent = section.dataset.nav;
+            linkItem.classList.add("menu__link");
+            linkItem.setAttribute("href", `#${sectionId}`);
+
+            navItem.append(linkItem);
+            navItemsFragment.append(navItem);
+        });
+
+        navItemsContainer.append(navItemsFragment);
+    };
+
+    const attachEventListeners = () => {
+        navItemsContainer.addEventListener("click", handleClick);
+        global.addEventListener("scroll", handleScroll);
+    };
+
+    /* 
+      Initialize main functions
+      =======================================
+    */
+
+    buildNavigationMenu();
+    attachEventListeners();
+})(window);
