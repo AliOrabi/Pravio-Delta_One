@@ -1,2 +1,3 @@
 # landing-page
-Udacity 1st project
+Landing page project requested by Udacity frontend nanodegree and FWD. 
+
